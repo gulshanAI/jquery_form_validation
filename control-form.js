@@ -1,4 +1,4 @@
-function validateForm($form){
+function validateForm($form) {
   $form.find('.err').html("");
   var btn = true;
   let allError = "";
@@ -7,43 +7,44 @@ function validateForm($form){
       $(this).css("border", "1px solid red");
       let $err = $(this).parent().find('.err');
       let errmsg = ""
-      if($err.attr("data"))
+      if ($err.attr("data"))
         errmsg = $err.attr("data")
       else
-        errmsg = $(this).attr("name")+" is missing"
-      if(errmsg != "no"){
-        allError += "<br>"+errmsg;
-        $(this).parent().find('.err').html(errmsg)
+        errmsg = $(this).attr("name") + " is missing"
+      if (errmsg != "no") {
+        allError += "<li>" + errmsg+"</li>";
+        $(this).parent().find('.err').html("<div class='alert-danger'>"+errmsg+"</div>")
       }
       btn = false;
     } else {
       $(this).css("border", "1px solid #dfdfdf");
     }
   });
-  if(!btn)
-    $form.find('.respHere').html("<div class='alert alert-danger'>"+allError+"</div>")
+  if (!btn)
+    $form.find('.respHere').html("<ul>" + allError + "</ul>")
   return btn;
 }
-$(document).ready(function(){
-  if(typeof $beforeSend === 'undefined')
+$(document).ready(function () {
+  if (typeof $beforeSend === 'undefined')
     $beforeSend = null;
-  console.log($beforeSend)
-  $('.myform').on('submit', function(){
+  $('.myform').on('submit', function () {
     let $form = $(this);
     let ajaxMethod = $(this).attr("ajax-method");
     var btn = validateForm($form);
-    if(btn){
-      if(!ajaxMethod)
+    if (btn) {
+      if (!ajaxMethod)
         return btn;
       var formData = new FormData(this);
       let $responseHere = $form.find('.respHere')
+      let afterCall = eval($form.attr("afterCall"))
       sendAjax($form, formData, afterCall, $responseHere, $beforeSend)
       // $form.find('.respHere').html(response);
     }
     return false;
   });
 });
-function sendAjax($form, formData, afterCall, $responseHere, $beforeSend){
+
+function sendAjax($form, formData, afterCall, $responseHere, $beforeSend) {
   let $button = $form.find('button[type="submit"]');
   let btn_load = $button.attr("btn_load");
   let btn_aftr = $button.html();
@@ -54,16 +55,18 @@ function sendAjax($form, formData, afterCall, $responseHere, $beforeSend){
     beforeSend: function () {
       $button.html(btn_load);
       $button.attr("disabled", true);
-      if($beforeSend != null)
+      if ($beforeSend != null)
         $beforeSend()
     },
     data: formData,
     contentType: false,
     cache: false,
     processData: false,
-    headers: {'X-Requested-With': 'XMLHttpRequest'},
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    },
     success: function (response) {
-      console.log(response)
+      // console.log(response)
       $button.html(btn_aftr);
       $button.attr("disabled", false);
       // return response;
